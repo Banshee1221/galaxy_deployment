@@ -1,0 +1,49 @@
+- name: Create galaxy user "{{ galaxy_user }}"
+  user:
+    name: "{{ galaxy_user }}"
+    home: "/opt/galaxy"
+    create_home: "true"
+    shell: "/bin/bash"
+    comment: "Galaxy User"
+    state: present
+
+- name: Install compilers and associated tools
+  package:
+    name: "{{item}}"
+    state: present
+  loop:
+    - build-essential
+    - python3-dev
+
+- name: Install postgresql
+  package:
+    name: "{{item}}"
+    state: present
+  loop:
+    - "postgresql-{{postgresql_version}}"
+    - "postgresql-server-dev-{{postgresql_version}}"
+
+- name: Install psycopg2
+  package:
+    pkg: python-psycopg2
+    state: present
+  when: ansible_python_version.startswith("2")
+- name: Install psycopg2
+  package:
+    pkg: python3-psycopg2
+    state: present
+  when: ansible_python_version.startswith("3")
+
+- name: Install Galaxy Dependencies
+  package:
+    name:
+      - git
+      - python-virtualenv
+    state: present
+
+- name: Create Galaxy base directory
+  file:
+    path: "{{ galaxy_server_dir }}"
+    state: directory
+    owner: "{{ galaxy_user }}"
+    mode: "0755"

@@ -1,0 +1,2 @@
+admin_ssh_public_key: "{{ lookup('file', '???') }}"
+ansible_ssh_user: ubuntu

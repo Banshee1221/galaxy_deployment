@@ -1,0 +1,27 @@
+---
+- name: Install Galaxy on Galaxy server
+  hosts: galaxy
+  tags: galaxy
+  become: yes
+  pre_tasks:
+    - include_role:
+        name: galaxy-bootstrap
+  tasks:
+    - name: Create PostgreSQL user and database
+      include_role:
+        name: natefoo.ansible-postgresql-objects
+      vars:
+        ansible_become: true
+        ansible_become_user: postgres
+    - name: Install Galaxy
+      include_role:
+        name: galaxyprojectdotorg.galaxy
+      vars:
+        ansible_become: true
+        ansible_become_user: "{{ galaxy_user }}"
+    - name: Install supervisord
+      include_role:
+        name: galaxy-supervisord
+    - name: Install nginx
+      include_role:
+        name: galaxy-nginx
