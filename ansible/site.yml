@@ -25,3 +25,11 @@
     - name: Install nginx
       include_role:
         name: galaxy-nginx
+  post_tasks:
+    - name: force all notified handlers to run at this point, not waiting for normal sync points
+      meta: flush_handlers
+    - name: sleep for 300 seconds and continue with play
+      wait_for: timeout=300
+    - name: Generate JS
+      include_role:
+        name: galaxy-post

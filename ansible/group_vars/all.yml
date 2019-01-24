@@ -1,2 +1,2 @@
-admin_ssh_public_key: "{{ lookup('file', '???') }}"
+admin_ssh_public_key: "{{ lookup('file', '/home/ubuntu/ansible/host.key') }}"
 ansible_ssh_user: ubuntu

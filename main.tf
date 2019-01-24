@@ -179,7 +179,7 @@ resource "openstack_compute_floatingip_associate_v2" "galaxy_fip1" {
       "sudo chmod 0600 ${var.playbook_location}/ansible/host.key",
       "printf 'Host *\n    StrictHostKeyChecking no' > ~/.ssh/config",
       "ansible-playbook -i ${var.playbook_location}/ansible/hosts ${var.playbook_location}/ansible/site.yml",
-      "rm -rf ${var.playbook_location}/ansible"
+      "rm -rf ${var.playbook_location}/ansible/host.key"
     ]
   }
 }
