@@ -109,11 +109,11 @@ resource "openstack_compute_floatingip_v2" "floatip_1" {
 
 resource "openstack_compute_instance_v2" "galaxy" {
   name            = "il_galaxy"
-  image_name      = "ubuntu-16.04_working"
+  image_id      = "${var.image_id}"
   flavor_name      = "m1.large"
-  key_pair        = "Eugene Laptop"
+  key_pair        = "${var.openstack_keypair}"
   security_groups = ["default", "secgroup_galaxy", "secgroup_general"]
-  user_data       = "#cloud-config\nhostname: galaxym.sanbi.ac.za\nfqdn: galaxym.sanbi.ac.za"
+  user_data       = "#cloud-config\nhostname: ${var.fqdn} \nfqdn: ${var.fqdn}"
 
   metadata {
     ansible_groups = "galaxy"

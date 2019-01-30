@@ -1,3 +1,5 @@
+packer_setup.sh
+packer.json
 hosts
 *.retry
 

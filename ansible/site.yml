@@ -6,6 +6,12 @@
   pre_tasks:
     - include_role:
         name: galaxy-bootstrap
+    - include_role:
+        name: ansible-role-cephfs_client
+      vars:
+        cephfs_client_mapping:
+          - {"src": "/projects/galaxy-dev", "dst": "/galaxy-dev", "id": "galaxy-dev", "key": ""}
+          - {"src": "/projects/galaxy", "dst": "/galaxy", "id": "galaxy", "key": ""}
   tasks:
     - name: Create PostgreSQL user and database
       include_role:
