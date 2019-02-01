@@ -28,6 +28,10 @@ module "galaxy_rules" {
   secgroup_id = "${openstack_networking_secgroup_v2.secgroup_galaxy.id}"
 }
 
+resource "openstack_compute_keypair_v2" "galaxy-keypair" {
+  name = "galaxy-dev-keypair"
+}
+
 resource "openstack_networking_network_v2" "network_1" {
     name = "sanbi-net"
     admin_state_up = "true"
@@ -111,7 +115,7 @@ resource "openstack_compute_instance_v2" "galaxy" {
   name            = "il_galaxy"
   image_id      = "${var.image_id}"
   flavor_name      = "m1.large"
-  key_pair        = "${var.openstack_keypair}"
+  key_pair        = "${openstack_compute_keypair_v2.galaxy-keypair.name}"
   security_groups = ["default", "secgroup_galaxy", "secgroup_general"]
   user_data       = "#cloud-config\nhostname: ${var.fqdn} \nfqdn: ${var.fqdn}"
 
@@ -131,11 +135,11 @@ resource "openstack_compute_floatingip_associate_v2" "galaxy_fip1" {
   provisioner "remote-exec" {
     connection {
       user = "ubuntu"
-      private_key = "${file(var.private_key_location)}"
+      private_key = "${openstack_compute_keypair_v2.galaxy-keypair.private_key}"
       host = "${openstack_compute_floatingip_v2.floatip_1.address}"
     }
     inline = [
-      "sudo apt-get update",
+      "sudo apt-get update; sleep 5",
       "sudo apt-get install -y python-minimal python-pip",
       "sudo pip install --upgrade pip",
       "sudo pip install ansible"
@@ -143,43 +147,43 @@ resource "openstack_compute_floatingip_associate_v2" "galaxy_fip1" {
   }
 
   provisioner "local-exec" {
-    command = "python3 inventory_gen.py ${var.playbook_location} > ./ansible/hosts"
+    command = "python3 inventory_gen.py /home/${var.remote_user}/ansible/host.key > ./ansible/hosts"
   }
 
 
   provisioner "file" {
     connection {
       user = "ubuntu"
-      private_key = "${file(var.private_key_location)}"
+      private_key = "${openstack_compute_keypair_v2.galaxy-keypair.private_key}"
       host = "${openstack_compute_floatingip_v2.floatip_1.address}"
     }
 
     source      = "./ansible"
-    destination = "${var.playbook_location}"
+    destination = "/home/${var.remote_user}/"
   }
 
-  provisioner "file" {
+  provisioner "remote-exec" {
     connection {
       user = "ubuntu"
-      private_key = "${file(var.private_key_location)}"
-      host = "${openstack_compute_floatingip_v2.floatip_1.address}"
-    }
-
-    source      = "${var.private_key_location}"
-    destination = "${var.playbook_location}/ansible/host.key"
-  }
-
-    provisioner "remote-exec" {
-    connection {
-      user = "ubuntu"
-      private_key = "${file(var.private_key_location)}"
+      private_key = "${openstack_compute_keypair_v2.galaxy-keypair.private_key}"
       host = "${openstack_compute_floatingip_v2.floatip_1.address}"
     }
     inline = [
-      "sudo chmod 0600 ${var.playbook_location}/ansible/host.key",
-      "printf 'Host *\n    StrictHostKeyChecking no' > ~/.ssh/config",
-      "ansible-playbook -i ${var.playbook_location}/ansible/hosts ${var.playbook_location}/ansible/site.yml",
-      "rm -rf ${var.playbook_location}/ansible/host.key"
+      "cat <<EOF > /home/ubuntu/ansible/host.key\n${openstack_compute_keypair_v2.galaxy-keypair.private_key}\nEOF"
+      ]
+  }
+
+  provisioner "remote-exec" {
+    connection {
+      user = "ubuntu"
+      private_key = "${openstack_compute_keypair_v2.galaxy-keypair.private_key}"
+      host = "${openstack_compute_floatingip_v2.floatip_1.address}"
+    }
+    inline = [
+      "sudo chmod 0600 /home/${var.remote_user}/ansible/host.key",
+      "printf 'Host *\n    StrictHostKeyChecking no' > /home/${var.remote_user}/.ssh/config",
+      "ansible-playbook -i /home/${var.remote_user}/ansible/hosts /home/${var.remote_user}/ansible/site.yml",
+      "rm -rf /home/${var.remote_user}/ansible/host.key"
     ]
   }
 }

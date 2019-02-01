@@ -4,17 +4,21 @@ import subprocess
 import ipaddress
 
 result = subprocess.run(['terraform', 'show', '-no-color'], stdout=subprocess.PIPE).stdout.decode('utf-8').split('\n')
+#print("test",result)
 
 heading = None
 tmpDict = {}
 for line in result:
-    if line.strip()[-1:] == ":":
+    if line.strip()[-1:] == ":" or line.strip()[-1:] == ")":
         heading = line.strip()[0:-1]
         tmpDict[heading] = {}
     else:
         if line.strip() == '':
             continue
-        k, v = line.strip().replace(" ", "").split("=")
+        try:
+            k, v = line.strip().replace(" ", "").split("=")
+        except:
+            pass
         tmpDict[heading][k] = v
 
 dictKeys = list(tmpDict.keys())
@@ -22,7 +26,7 @@ for i in dictKeys:
     if "openstack_compute_floatingip_associate_v2" not in i and"openstack_compute_instance_v2" not in i:
         del tmpDict[i]
 
-        
+
 
 for fipKey in dictKeys:
     if "openstack_compute_floatingip_associate_v2" in fipKey:
