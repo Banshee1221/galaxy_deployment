@@ -290,6 +290,10 @@ output "galaxy_ext_ip" {
   value = "${openstack_compute_floatingip_associate_v2.galaxy_fip1.floating_ip}"
 }
 
+output "galaxy_priv_key" {
+  value = "${openstack_compute_keypair_v2.galaxy-keypair.private_key}"
+}
+
 #output "slurmwn1_ip" {
 #  value = "${openstack_compute_instance_v2.slurmwn1.network.0.fixed_ip_v4}"
 #}

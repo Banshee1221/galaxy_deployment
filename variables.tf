@@ -3,7 +3,7 @@ variable "remote_user" {
 }
 
 variable "image_id" {
-    default = "ad3d08b6-df09-45c0-93f9-e63e3d2f24d5"  
+    default = "ceca3226-51cb-4c9a-8a84-db8aedf0b847"  
 }
 
 variable "fqdn" {

@@ -25,6 +25,8 @@
       vars:
         ansible_become: true
         ansible_become_user: "{{ galaxy_user }}"
+    - name: Ensure pyOpenSSL
+      command: "python -m easy_install --upgrade pyOpenSSL"
     - name: Install supervisord
       include_role:
         name: galaxy-supervisord

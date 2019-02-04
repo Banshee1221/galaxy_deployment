@@ -1,2 +1,5 @@
-admin_ssh_public_key: "{{ lookup('file', '/home/ubuntu/ansible/host.key') }}"
+# The admin_ssh_public_key is where the ansible must look for the private key on the virtual machine
+# NOT on the machine running the terraform. Usually you only change the username (ubuntu).
 ansible_ssh_user: ubuntu
+admin_ssh_public_key: "{{ lookup('file', '/home/ubuntu/ansible/host.key') }}"
+
