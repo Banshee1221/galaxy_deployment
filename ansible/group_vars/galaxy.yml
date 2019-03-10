@@ -1,10 +1,20 @@
 # Pre-task variables
-galaxy_server_dir: '/opt/galaxy/galaxy'
+cephfs_mounts:
+  - src: "/tools"
+    dst: "/tools"
+    id: "tools"
+    key: "{{ lookup('hashi_vault', 'secret=secret/ansible/cephfs/tools:token') }}"
+  - src: "/people"
+    dst: "/usr/people"
+    id: "people"
+    key: "{{ lookup('hashi_vault', 'secret=secret/ansible/cephfs/people:token') }}"
+galaxy_server_dir: '/tools/software/galaxy/sanbi_galaxy1'
 galaxy_config_dir: "{{ galaxy_server_dir }}/config"
-galaxy_user: galaxy
-galaxy_group: galaxy
+galaxy_user: galaxyuser
+galaxy_group: galaxyuser
 galaxy_config_style: yaml
-galaxy_commit_id: 'release_18.09'
+galaxy_commit_id: 'release_19.01'
+var_slurm_install_dir: "/tools/admin/slurm"
 galaxy_config:
   uwsgi:
     socket: 127.0.0.1:4001
@@ -31,8 +41,11 @@ galaxy_config:
       - lib/galaxy/main.py
     farm: 'job-handlers:1,2'
   galaxy:
-    database_connection: "postgresql:///galaxy?host=/var/run/postgresql"
-    admin_users: "eugene@sanbi.ac.za"
+    database_connection: "postgresql:///galaxyuser?host=/var/run/postgresql"
+    admin_users: "eugene@sanbi.ac.za,pvh@sanbi.ac.za,thoba@sanbi.ac.za,zipho@sanbi.ac.za"
+    nginx_x_accel_redirect_base: /_x_accel_redirect
+    tool_sheds_config_file: "{{ galaxy_server_dir }}/config/tool_sheds_conf.xml"
+    ftp_upload_dir: /tools/software/galaxy/upload_dirs/sanbi_galaxy1
 
 postgresql_objects_users:
   - name: "{{ galaxy_user | default('galaxy') }}"
@@ -40,3 +53,5 @@ postgresql_objects_databases:
   - name: "{{ postgresql_objects_users[0]['name'] }}"
     owner: "{{ postgresql_objects_users[0]['name'] }}"
 postgresql_version: 9.5
+galaxy_use_singularity: true
+singularity_command: "/tools/software/singularity-2.5.2/bin/singularity"
