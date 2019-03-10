@@ -6,6 +6,7 @@
     shell: "/bin/bash"
     comment: "Galaxy User"
     state: present
+  when: not use_freeipa
 
 - name: Install compilers and associated tools
   package:

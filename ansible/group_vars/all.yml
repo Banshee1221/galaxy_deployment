@@ -2,4 +2,4 @@
 # NOT on the machine running the terraform. Usually you only change the username (ubuntu).
 ansible_ssh_user: ubuntu
 admin_ssh_public_key: "{{ lookup('file', '/home/ubuntu/ansible/host.key') }}"
-
+use_freeipa: true  # use a Galaxy user from FreeIPA - needs to pre-exist
