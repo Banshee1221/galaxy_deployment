@@ -1,4 +1,5 @@
 # Pre-task variables
+galaxy_server_name: 'main_sanbi_galaxy1'
 cephfs_mounts:
   - src: "/tools"
     dst: "/tools"
@@ -8,7 +9,31 @@ cephfs_mounts:
     dst: "/usr/people"
     id: "people"
     key: "{{ lookup('hashi_vault', 'secret=secret/ansible/cephfs/people:token') }}"
-galaxy_server_dir: '/tools/software/galaxy/sanbi_galaxy1'
+  - src: "/projects/galaxy"
+    dst: "/projects/galaxy"
+    id: "projectsgalaxy"
+    key: "{{ lookup('hashi_vault', 'secret=secret/ansible/cephfs/projectgalaxy:token') }}"
+galaxy_server_dir: '/projects/galaxy/{{ galaxy_server_name }}'
+galaxy_config_dir: "{{ galaxy_server_dir }}/config"
+galaxy_user: galaxyuser
+galaxy_group: galaxyuser
+galaxy_config_style: yaml
+galaxy_commit_id: 'release_19.01'
+var_slurm_install_dir: "/tools/admin/slurm"
+galaxy_config:
+  uwsgi:
+    socket: 127.0.0.1:4001
+    buffer-size: 16384
+    processes: 1
+    threads: 4
+    offload-threads: 2
+    static-map:
+      - /static/style={{ galaxy_server_dir }}/static/style/blue
+      - /static={{ galaxy_server_dir }}/static
+    master: true
+    virtualenv: "{{ galaxy_venv_dir }}"
+    pythonpath: "{{ galaxy_server_dir }}/lib"
+galaxy_server_dir: '/projects/galaxy/{{ galaxy_server_name }}'
 galaxy_config_dir: "{{ galaxy_server_dir }}/config"
 galaxy_user: galaxyuser
 galaxy_group: galaxyuser
