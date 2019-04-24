@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<job_conf>
+    <plugins>
+        <plugin id="local" type="runner" load="galaxy.jobs.runners.local:LocalJobRunner" workers="4"/>
+        <plugin id="slurm" type="runner" load="galaxy.jobs.runners.slurm:SlurmJobRunner" workers="2"/>
+    </plugins>
+    <destinations default="dynamic">
+        <destination id="local" runner="local"/>
+        <destination id="dynamic" runner="dynamic">
+            <param id="type">dtd</param>
+        </destination>
+        <destination id="cluster_default" runner="slurm">
+            <param id="singularity_enabled">true</param>
+            <param id="singularity_cmd">/tools/software/singularity-2.5.2/bin/singularity</param>
+            <env id="SLURM_CONF">/tools/admin/slurm/etc/slurm.conf</env>
+            <param id="nativeSpecification">--mem=10000</param>
+            <resubmit condition="memory_limit_reached" destination="cluster_20G" />
+        </destination>
+        <destination id="cluster_20G" runner="slurm">
+            <param id="singularity_enabled">true</param>
+
+            <env id="SLURM_CONF">/tools/admin/slurm/etc/slurm.conf</env>
+            <param id="nativeSpecification">--mem=20000</param>
+            <resubmit condition="memory_limit_reached" destination="cluster_40G" />
+        </destination>
+        <destination id="cluster_40G" runner="slurm">
+            <param id="singularity_enabled">true</param>
+            <param id="singularity_cmd">/tools/software/singularity-2.5.2/bin/singularity</param>
+
+            <env id="SLURM_CONF">/tools/admin/slurm/etc/slurm.conf</env>
+            <param id="nativeSpecification">--mem=40000</param>
+        </destination>
+    </destinations>
+</job_conf>
+

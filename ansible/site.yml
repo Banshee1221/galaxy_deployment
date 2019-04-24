@@ -5,13 +5,13 @@
   become: yes
   pre_tasks:
     - include_role:
-        name: galaxy-bootstrap
-    - include_role:
+        name: sanbi-ansible-role-common
+    - include_role: # TODO: make this optional
         name: ansible-role-cephfs_client
       vars:
-        cephfs_client_mapping:
-          - {"src": "/projects/galaxy-dev", "dst": "/galaxy-dev", "id": "galaxy-dev", "key": ""}
-          - {"src": "/projects/galaxy", "dst": "/galaxy", "id": "galaxy", "key": ""}
+        cephfs_client_mapping: "{{ cephfs_mounts }}"
+    - include_role:
+        name: galaxy-bootstrap
   tasks:
     - name: Create PostgreSQL user and database
       include_role:
@@ -33,6 +33,9 @@
     - name: Install nginx
       include_role:
         name: galaxy-nginx
+    - name: Setup Slurm job submission for Galaxy
+      include_role:
+        name: galaxy-slurm-drmaa
   post_tasks:
     - name: force all notified handlers to run at this point, not waiting for normal sync points
       meta: flush_handlers

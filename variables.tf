@@ -7,7 +7,7 @@ variable "image_id" {
 }
 
 variable "fqdn" {
-    default = "galaxym.sanbi.ac.za"
+    default = "ctb-galaxy.sanbi.ac.za"
 }
 
 variable "public_network" {
@@ -17,3 +17,5 @@ variable "public_network" {
 variable "ceph_network" {
     default = "ceph-net"
 }
+
+variable "vault_token" { }

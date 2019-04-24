@@ -49,7 +49,7 @@
     become_user: "{{ galaxy_user }}"
   
   - name: Copy job_conf.xml in place
-    template:
+    copy:
       src: "{{ job_conf }}"
       dest: "{{ galaxy_server_dir }}/config/job_conf.xml"
     become: true
@@ -63,4 +63,12 @@
     become: true
     become_user: "{{ galaxy_user }}"
     notify: restart galaxy
+
+  - name: Add reference to SLURM DRMAA  # incomplete and BROKEN: TODO, ensure this adds slurm bin dir to PATH as well
+    lineinfile:
+      path: /etc/supervisor/conf.d/galaxy.conf
+      regexp: "^(environment.*)(,D.*)?"
+      state: present
+      backrefs: true
+      line: '\1,DRMAA_LIBRARY_PATH={{var_slurm_install_dir}}/lib/libdrmaa.so'
   tags: galaxy-slurm-drmaa

@@ -112,7 +112,7 @@ resource "openstack_compute_floatingip_v2" "floatip_1" {
 }
 
 resource "openstack_compute_instance_v2" "galaxy" {
-  name            = "il_galaxy"
+  name            = "${var.fqdn}"
   image_id      = "${var.image_id}"
   flavor_name      = "m1.large"
   key_pair        = "${openstack_compute_keypair_v2.galaxy-keypair.name}"
@@ -182,7 +182,7 @@ resource "openstack_compute_floatingip_associate_v2" "galaxy_fip1" {
     inline = [
       "sudo chmod 0600 /home/${var.remote_user}/ansible/host.key",
       "printf 'Host *\n    StrictHostKeyChecking no' > /home/${var.remote_user}/.ssh/config",
-      "ansible-playbook -i /home/${var.remote_user}/ansible/hosts /home/${var.remote_user}/ansible/site.yml",
+      "VAULT_TOKEN=\"${var.vault_token}\" VAULT_ADDR=https://commander.sanbi.ac.za:8200 ansible-playbook -i /home/${var.remote_user}/ansible/hosts /home/${var.remote_user}/ansible/site.yml",
       "rm -rf /home/${var.remote_user}/ansible/host.key"
     ]
   }
